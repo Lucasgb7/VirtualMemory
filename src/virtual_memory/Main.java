@@ -6,6 +6,8 @@
 package virtual_memory;
 
 import java.math.BigInteger;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 /**
@@ -101,6 +103,35 @@ public class Main {
         String hex = Integer.toHexString(fodaseInt);
         hex = "0x00" + hex;
         System.out.println("\n" + hex);
-    }
+        
+        HashMap<String, String> tabela_address_contents = new HashMap<>();
+        tabela_address_contents.put("0x0001a038", "0x000b4045");
+        tabela_address_contents.put("0x000b4b9c", "0x236b12c1");
+        tabela_address_contents.put("0x000b91a0", "0x1b9d8fc5");
+        tabela_address_contents.put("0x001b31cc", "0x003a9067");
+        tabela_address_contents.put("0x001b3458", "0x0001a067");
+        tabela_address_contents.put("0x003a9054", "0x000b9067");
+        /* Ver o link https://wwww.w3schools.com/java/java_hashmap.asp
+                      https://blog.alura.com.br/iterando-por-um-hashmap-em-java/
+        */
+        System.out.println("\n\n");
+        String conteudoMem = new String();
+        for (Map.Entry<String, String> i : tabela_address_contents.entrySet()){
+            if (hex.equals(i.getKey())){
+                conteudoMem = i.getValue();
+            }
+        }
+        conteudoMem = hexaPraBinario(conteudoMem);
+        
+        HashMap<String, String> tabela_bits = new HashMap<>();
+        tabela_bits.put("31-12", "");
+        tabela_bits.put("11-7", "");
+        tabela_bits.put("6", "");
+        tabela_bits.put("5", "");
+        tabela_bits.put("4-3", "");
+        tabela_bits.put("2", "");
+        tabela_bits.put("1", "");
+        tabela_bits.put("0", "");
     
+    }    
 }
