@@ -17,71 +17,22 @@ import java.util.Scanner;
 public class Main {
 
     static String hexToBin(String s) {
-        return new BigInteger(s, 16).toString(2);
+        if("0x".equals(s.substring(0, 2))){
+            s = s.replace("0x", "");
     }
-    static String hexaPraBinario(String s){
-        String binario = "";
-        for (int i = 0; i < s.length(); i++){
-            char c = s.charAt(i);
-            switch (c){
-                case '0':
-                    binario += "0000";
-                    break;
-                case '1':
-                    binario += "0001";
-                    break;
-                case '2':
-                    binario += "0010";
-                    break;
-                case '3':
-                    binario += "0011";
-                    break;
-                case '4':
-                    binario += "0100";
-                    break;
-                case '5':
-                    binario += "0101";
-                    break;
-                case '6':
-                    binario += "0110";
-                    break;
-                case '7':
-                    binario += "0111";
-                    break;
-                case '8':
-                    binario += "1000";
-                    break;
-                case '9':
-                    binario += "1001";
-                    break;
-                case 'A':
-                    binario += "1010";
-                    break;
-                case 'B':
-                    binario += "1011";
-                    break;
-                case 'C':
-                    binario += "1100";
-                    break;
-                case 'D':
-                    binario += "1101";
-                    break;
-                case 'E':
-                    binario += "1110";
-                    break;
-                case 'F':
-                    binario += "1111";
-                    break;
-            }
-        }
-        return binario;
+        String bin = new BigInteger(s, 16).toString(2);
+        return "0x" + String.format("%32s", bin).replace(" ", "0");
+    }
+    
+    static String binToHex(String s){
+        return null;
     }
     
     public static void main(String[] args) {
         Scanner s = new Scanner(System.in);
         String posicaoInicial = "1CC151A0";
         String pdbr = "001B3000";
-        posicaoInicial = hexaPraBinario(posicaoInicial);
+        posicaoInicial = hexToBin(posicaoInicial);
         System.out.println("VM Adress: " + posicaoInicial);
 
         String vmAdress = posicaoInicial.substring(0, 10);
@@ -121,17 +72,15 @@ public class Main {
                 conteudoMem = i.getValue();
             }
         }
-        conteudoMem = hexaPraBinario(conteudoMem);
         
         HashMap<String, String> tabela_bits = new HashMap<>();
-        tabela_bits.put("31-12", "");
-        tabela_bits.put("11-7", "");
-        tabela_bits.put("6", "");
-        tabela_bits.put("5", "");
-        tabela_bits.put("4-3", "");
-        tabela_bits.put("2", "");
-        tabela_bits.put("1", "");
-        tabela_bits.put("0", "");
-    
+        tabela_bits.put("31-12", "0x" + conteudoMem.substring(0, 4));
+        tabela_bits.put("11-7", "0x" + hexToBin(conteudoMem).substring(20, 24));
+        tabela_bits.put("6", hexToBin(conteudoMem).substring(25));
+        tabela_bits.put("5", hexToBin(conteudoMem).substring(26));
+        tabela_bits.put("4-3", hexToBin(conteudoMem).substring(27, 28));
+        tabela_bits.put("2", hexToBin(conteudoMem).substring(29));
+        tabela_bits.put("1", hexToBin(conteudoMem).substring(30));
+        tabela_bits.put("0", hexToBin(conteudoMem).substring(31));
     }    
 }
