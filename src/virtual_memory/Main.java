@@ -30,8 +30,8 @@ public class Main {
     
     public static void main(String[] args) {
         Scanner s = new Scanner(System.in);
-        String posicaoInicial = "1CC151A0";
-        String pdbr = "001B3000";
+        String posicaoInicial = "0x1CC151A0";
+        String pdbr = "0x001B3000";
         posicaoInicial = hexToBin(posicaoInicial);
         System.out.println("VM Adress: " + posicaoInicial);
 
@@ -50,10 +50,9 @@ public class Main {
 
         int a = Integer.parseInt(vmMultiplicado, 16);
         int b = Integer.parseInt(pdbr, 16);
-        int fodaseInt = a + b;
-        String hex = Integer.toHexString(fodaseInt);
+        int resultado = a + b;
+        String hex = Integer.toHexString(resultado);
         hex = "0x00" + hex;
-        System.out.println("\n" + hex);
         
         HashMap<String, String> tabela_address_contents = new HashMap<>();
         tabela_address_contents.put("0x0001a038", "0x000b4045");
@@ -82,5 +81,20 @@ public class Main {
         tabela_bits.put("2", hexToBin(conteudoMem).substring(29));
         tabela_bits.put("1", hexToBin(conteudoMem).substring(30));
         tabela_bits.put("0", hexToBin(conteudoMem).substring(31));
+        
+        String novoEnd = tabela_bits.get("31-12") + "000";
+        pageNumber = pageNumber + "00";
+        int pageNumberMult = Integer.parseInt(pageNumber);
+        String pageNumberMultiplicado = Integer.toString(pageNumberMult,16);
+        int end = Integer.parseInt(novoEnd, 16);
+        resultado = pageNumberMult + end;
+        String newHex = Integer.toHexString(resultado);
+        
+        for (Map.Entry<String, String> i : tabela_address_contents.entrySet()){
+            if (newHex.equals(i.getKey())){
+                conteudoMem = i.getValue();
+            }
+        }
+        
     }    
 }
