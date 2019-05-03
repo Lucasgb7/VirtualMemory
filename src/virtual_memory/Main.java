@@ -21,7 +21,11 @@ public class Main {
             s = s.replace("0x", "");
     }
         String bin = new BigInteger(s, 16).toString(2);
-        return "0x" + String.format("%32s", bin).replace(" ", "0");
+        return String.format("%32s", bin).replace(" ", "0");
+    }
+    
+    static String remove0x(String s) {
+        return s = s.replaceAll("0x", "");
     }
     
     static String binToHex(String s){
@@ -30,29 +34,29 @@ public class Main {
     
     public static void main(String[] args) {
         Scanner s = new Scanner(System.in);
-        String posicaoInicial = "0x1CC151A0";
+        String vmAdress_hex = "0x1CC151A0";
         String pdbr = "0x001B3000";
-        posicaoInicial = hexToBin(posicaoInicial);
-        System.out.println("VM Adress: " + posicaoInicial);
+        String vmAdress_bin = hexToBin(vmAdress_hex);
+        System.out.println("VM Adress: " + vmAdress_bin);
 
-        String vmAdress = posicaoInicial.substring(0, 10);
-        String pageNumber = posicaoInicial.substring(10, 20);
-        String offset = posicaoInicial.substring(20, 32);
-
-        System.out.print("Page Table Number: " + vmAdress);
+        String pageTableNumber = vmAdress_bin.substring(0, 10);
+        String pageNumber = vmAdress_bin.substring(10, 20);
+        String offset = vmAdress_bin.substring(20, 32);
+        
+        System.out.print("------ Endereços divididos -----\n");
+        System.out.print("Page Table Number: " + pageTableNumber);
         System.out.print("\nPage Number: " + pageNumber);
         System.out.print("\nOffset: " + offset);
-
-        vmAdress = vmAdress + "00";
-        int decimal = Integer.parseInt(vmAdress,2);
-        String vmMultiplicado = Integer.toString(decimal,16);
-        System.out.printf("\n Page Table Number * 4 = 0x" + vmMultiplicado);
-
-        int a = Integer.parseInt(vmMultiplicado, 16);
-        int b = Integer.parseInt(pdbr, 16);
+        System.out.print("\n\n");
+        
+        String ptnDeslocado = leftShift_2bits(pageTableNumber); 
+        System.out.printf("\nPage Table Number * 4 = " + ptnDeslocado);
+        
+        int a = Integer.parseInt(remove0x(ptnDeslocado), 16);
+        int b = Integer.parseInt(remove0x(pdbr), 16);
         int resultado = a + b;
         String hex = Integer.toHexString(resultado);
-        hex = "0x00" + hex;
+        hex = "0x00" + hex; // Completa o resultado com dois zeros antes
         
         HashMap<String, String> tabela_address_contents = new HashMap<>();
         tabela_address_contents.put("0x0001a038", "0x000b4045");
@@ -71,7 +75,6 @@ public class Main {
                 conteudoMem = i.getValue();
             }
         }
-        
         HashMap<String, String> tabela_bits = new HashMap<>();
         tabela_bits.put("31-12", "0x" + conteudoMem.substring(0, 4));
         tabela_bits.put("11-7", "0x" + hexToBin(conteudoMem).substring(20, 24));
@@ -95,6 +98,11 @@ public class Main {
                 conteudoMem = i.getValue();
             }
         }
-        
+        System.out.println("\n\tSegundo conteúdo da memória: " + conteudoMem);
     }    
+    private static String leftShift_2bits(String val_dec) throws NumberFormatException {
+        int decimal = Integer.parseInt(val_dec, 2) * 4; // Page Table Number * 4
+        String valDeslocado = "0x00000" + Integer.toHexString(decimal); // Adicionando zeros para completar o nº
+        return valDeslocado;
+    }
 }
