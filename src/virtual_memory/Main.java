@@ -15,7 +15,6 @@ import java.util.Scanner;
  * @author Luiz Alberto Zimmermann Zabel Martins Pinto
  */
 public class Main {
-
     static String hexToBin(String s) {
         if("0x".equals(s.substring(0, 2))){
             s = s.replace("0x", "");
@@ -23,13 +22,21 @@ public class Main {
         String bin = new BigInteger(s, 16).toString(2);
         return String.format("%32s", bin).replace(" ", "0");
     }
-    
     static String remove0x(String s) {
         return s = s.replaceAll("0x", "");
     }
-    
-    static String binToHex(String s){
-        return null;
+       
+   static String completaZeros(String valor){ // Função para completar os zeros a esquerda do numero
+        switch(valor.length()){
+            case 1: return "0000000" + valor; // 7 zeros
+            case 2: return "000000" + valor; // 6 zeros
+            case 3: return "00000" + valor; // 5 zeros
+            case 4: return "0000" + valor; // 4 zeros
+            case 5: return "000" + valor; // 3 zeros
+            case 6: return "00" + valor; // 2 zeros
+            case 7: return "0" + valor; // 1 zero
+        }
+        return valor;
     }
     
     public static void main(String[] args) {
@@ -56,7 +63,7 @@ public class Main {
         int b = Integer.parseInt(remove0x(pdbr), 16);
         int resultado = a + b;
         String adress1 = Integer.toHexString(resultado);
-        adress1 = "0x00" + adress1; // Completa o resultado com dois zeros antes
+        adress1 = "0x" + completaZeros(adress1); // Completa o resultado com dois zeros antes
         System.out.println("adress1:"+ adress1);
         
         HashMap<String, String> tabela_address_contents = new HashMap<>();
@@ -76,36 +83,30 @@ public class Main {
                 conteudoMem = i.getValue();
             }
         }
-        System.out.println("conteudo:"+conteudoMem);
+        System.out.println("Conteudo 1:"+conteudoMem);
         
-        HashMap<String, String> tabela_bits = new HashMap<>();
-        tabela_bits.put("31-12", conteudoMem.substring(0, 7));
-        tabela_bits.put("11-7", "0x" + hexToBin(conteudoMem).substring(20, 24));
-        tabela_bits.put("6", hexToBin(conteudoMem).substring(25));
-        tabela_bits.put("5", hexToBin(conteudoMem).substring(26));
-        tabela_bits.put("4-3", hexToBin(conteudoMem).substring(27, 28));
-        tabela_bits.put("2", hexToBin(conteudoMem).substring(29));
-        tabela_bits.put("1", hexToBin(conteudoMem).substring(30));
-        tabela_bits.put("0", hexToBin(conteudoMem).substring(31));
+        HashMap<String, String> tabela1_bits = new HashMap<>();
+        tabela1_bits.put("31-12", conteudoMem.substring(0, 7));
+        tabela1_bits.put("11-7", "0x" + hexToBin(conteudoMem).substring(20, 24));
+        tabela1_bits.put("6", hexToBin(conteudoMem).substring(25));
+        tabela1_bits.put("5", hexToBin(conteudoMem).substring(26));
+        tabela1_bits.put("4-3", hexToBin(conteudoMem).substring(27, 28));
+        tabela1_bits.put("2", hexToBin(conteudoMem).substring(29));
+        tabela1_bits.put("1", hexToBin(conteudoMem).substring(30));
+        tabela1_bits.put("0", hexToBin(conteudoMem).substring(31));
         
         
-        String Contains1 = tabela_bits.get("31-12") + "000";
-      
-        System.out.println("Contains1:"+Contains1);//
+        String conteudo31_12 = tabela1_bits.get("31-12") + "000"; // Completando (31-12) com zeros
+        System.out.println("Conteudo (31-12): " + conteudo31_12); // Conteúdo do primeiro endereço
+        pageNumber = leftShift_2bits(pageNumber); // Multiplica o PN por 4
+        System.out.println("PageNumber * 4: " + pageNumber); // Imprime o PN Multiplicado
         
-        pageNumber= leftShift_2bits(pageNumber);
-        
-        System.out.println("PageNumber *4:"+pageNumber);//
-        
-        //pageNumber = pageNumber + "00";
-        int pageNumberMult = Integer.parseInt(remove0x(pageNumber),16);
-        //contains da tabela 1 mais 000
-        int contains1Sum0 = Integer.parseInt(remove0x(Contains1),16);
-        System.out.println("contains:"+contains1Sum0);
-        resultado = contains1Sum0 + pageNumberMult;
-        String adress2 = Integer.toHexString(resultado);
-        adress2 = "0x00"+ adress2;
-        System.out.println("adress2:"+adress2);
+        int pageNumberMult = Integer.parseInt(remove0x(pageNumber),16); // Converte PN para decimal 
+        int contains1Sum0 = Integer.parseInt(remove0x(conteudo31_12),16); // Converte os primeiros 10 bits do primeiro conteúdo para decimal
+        resultado = contains1Sum0 + pageNumberMult; // Soma os dois decimais convertidos
+        String adress2 = Integer.toHexString(resultado); // Converte o resultado para String Hexadecimal
+        adress2 = "0x"+ completaZeros(adress2); 
+        System.out.println("Adress2: " + adress2);
         //String pageNumberMultiplicado = Integer.toString(pageNumberMult,16);
         //int end = Integer.parseInt(Contains1, 16);
         //resultado = pageNumberMult + end;
@@ -124,13 +125,43 @@ public class Main {
                 conteudoMem = i.getValue();
             }
         }
+        
         System.out.println("adress2:"+adress2);
         System.out.println("\n\tSegundo conteúdo econtrado: " + conteudoMem);
+        // ----------
         
+        HashMap<String, String> tabela2_bits = new HashMap<>();
+        tabela2_bits.put("31-12", conteudoMem.substring(0, 7));
+        tabela2_bits.put("11-7", "0x" + hexToBin(conteudoMem).substring(20, 24));
+        tabela2_bits.put("6", hexToBin(conteudoMem).substring(25));
+        tabela2_bits.put("5", hexToBin(conteudoMem).substring(26));
+        tabela2_bits.put("4-3", hexToBin(conteudoMem).substring(27, 28));
+        tabela2_bits.put("2", hexToBin(conteudoMem).substring(29));
+        tabela2_bits.put("1", hexToBin(conteudoMem).substring(30));
+        tabela2_bits.put("0", hexToBin(conteudoMem).substring(31));
+       
+        String segundo_conteudo31_12 = tabela2_bits.get("31-12") + "000"; // Completando (31-12) com zeros
+        System.out.println("2º Conteudo 31-12: " + segundo_conteudo31_12); // Conteúdo do primeiro endereço
+        
+        int offset_int = Integer.parseInt(offset, 2); // Converte PN para decimal 
+        int segundo_conteudo31_12_int = Integer.parseInt(remove0x(segundo_conteudo31_12),16); // Converte os primeiros 10 bits do primeiro conteúdo para decimal
+        resultado = offset_int + segundo_conteudo31_12_int; // Soma os dois decimais convertidos
+        String address3 = Integer.toHexString(resultado); // Converte o resultado para String Hexadecimal
+        address3 = "0x" + completaZeros(address3);
+        
+        System.out.println("\n3º Endereço: " + address3);
+        
+        for (Map.Entry<String, String> i : tabela_address_contents.entrySet()){
+            if (address3.equals(i.getKey())){
+                conteudoMem = i.getValue();
+            }
+        }
+        System.out.println("3º conteudo (end. fisico): " + conteudoMem);
     }    
+
     private static String leftShift_2bits(String val_dec) throws NumberFormatException {
         int decimal = Integer.parseInt(val_dec, 2) * 4; // Page Table Number * 4
-        String valDeslocado = "0x00000" + Integer.toHexString(decimal); // Adicionando zeros para completar o nº
-        return valDeslocado;
-    }
+        String valDeslocado = completaZeros(Integer.toHexString(decimal));
+            return valDeslocado;
+        }
 }
