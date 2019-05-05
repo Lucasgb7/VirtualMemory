@@ -34,7 +34,7 @@ public class Main {
     
     public static void main(String[] args) {
         Scanner s = new Scanner(System.in);
-        String vmAdress_hex = "0x1CC151A0";
+        String vmAdress_hex = "0x4580eb9c";
         String pdbr = "0x001B3000";
         String vmAdress_bin = hexToBin(vmAdress_hex);
         System.out.println("VM Adress: " + vmAdress_bin);
@@ -50,13 +50,14 @@ public class Main {
         System.out.print("\n\n");
         
         String ptnDeslocado = leftShift_2bits(pageTableNumber); 
-        System.out.printf("\nPage Table Number * 4 = " + ptnDeslocado);
+        System.out.println("\nPage Table Number * 4 = " + ptnDeslocado);
         
         int a = Integer.parseInt(remove0x(ptnDeslocado), 16);
         int b = Integer.parseInt(remove0x(pdbr), 16);
         int resultado = a + b;
-        String hex = Integer.toHexString(resultado);
-        hex = "0x00" + hex; // Completa o resultado com dois zeros antes
+        String adress1 = Integer.toHexString(resultado);
+        adress1 = "0x00" + adress1; // Completa o resultado com dois zeros antes
+        System.out.println("adress1:"+ adress1);
         
         HashMap<String, String> tabela_address_contents = new HashMap<>();
         tabela_address_contents.put("0x0001a038", "0x000b4045");
@@ -71,12 +72,14 @@ public class Main {
         System.out.println("\n\n");
         String conteudoMem = new String();
         for (Map.Entry<String, String> i : tabela_address_contents.entrySet()){
-            if (hex.equals(i.getKey())){
+            if (adress1.equals(i.getKey())){
                 conteudoMem = i.getValue();
             }
         }
+        System.out.println("conteudo:"+conteudoMem);
+        
         HashMap<String, String> tabela_bits = new HashMap<>();
-        tabela_bits.put("31-12", "0x" + conteudoMem.substring(0, 4));
+        tabela_bits.put("31-12", conteudoMem.substring(0, 7));
         tabela_bits.put("11-7", "0x" + hexToBin(conteudoMem).substring(20, 24));
         tabela_bits.put("6", hexToBin(conteudoMem).substring(25));
         tabela_bits.put("5", hexToBin(conteudoMem).substring(26));
@@ -85,20 +88,45 @@ public class Main {
         tabela_bits.put("1", hexToBin(conteudoMem).substring(30));
         tabela_bits.put("0", hexToBin(conteudoMem).substring(31));
         
-        String novoEnd = tabela_bits.get("31-12") + "000";
-        pageNumber = pageNumber + "00";
-        int pageNumberMult = Integer.parseInt(pageNumber);
-        String pageNumberMultiplicado = Integer.toString(pageNumberMult,16);
-        int end = Integer.parseInt(novoEnd, 16);
-        resultado = pageNumberMult + end;
-        String newHex = Integer.toHexString(resultado);
+        
+        String Contains1 = tabela_bits.get("31-12") + "000";
+      
+        System.out.println("Contains1:"+Contains1);//
+        
+        pageNumber= leftShift_2bits(pageNumber);
+        
+        System.out.println("PageNumber *4:"+pageNumber);//
+        
+        //pageNumber = pageNumber + "00";
+        int pageNumberMult = Integer.parseInt(remove0x(pageNumber),16);
+        //contains da tabela 1 mais 000
+        int contains1Sum0 = Integer.parseInt(remove0x(Contains1),16);
+        System.out.println("contains:"+contains1Sum0);
+        resultado = contains1Sum0 + pageNumberMult;
+        String adress2 = Integer.toHexString(resultado);
+        adress2 = "0x00"+ adress2;
+        System.out.println("adress2:"+adress2);
+        //String pageNumberMultiplicado = Integer.toString(pageNumberMult,16);
+        //int end = Integer.parseInt(Contains1, 16);
+        //resultado = pageNumberMult + end;
+ 
         
         for (Map.Entry<String, String> i : tabela_address_contents.entrySet()){
-            if (newHex.equals(i.getKey())){
+            if (adress1.equals(i.getKey())){
                 conteudoMem = i.getValue();
             }
         }
-        System.out.println("\n\tSegundo conteúdo da memória: " + conteudoMem);
+        System.out.println("adress1:"+adress1);
+        System.out.println("\n\tPrimeiro conteúdo econtrado: " + conteudoMem);
+        //nao tapegando o segundo conteudo 0x000b4045
+        for (Map.Entry<String, String> i : tabela_address_contents.entrySet()){
+            if (adress2.equals(i.getKey())){
+                conteudoMem = i.getValue();
+            }
+        }
+        System.out.println("adress2:"+adress2);
+        System.out.println("\n\tSegundo conteúdo econtrado: " + conteudoMem);
+        
     }    
     private static String leftShift_2bits(String val_dec) throws NumberFormatException {
         int decimal = Integer.parseInt(val_dec, 2) * 4; // Page Table Number * 4
